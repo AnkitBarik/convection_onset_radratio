@@ -25,7 +25,7 @@ if schematic:
 
     fig, ax = plt.subplots(1, 1, figsize=figsize)
 
-    chi1 = 0.92
+    chi1 = 0.35
     chiStr = "{:.2f}".format(chi1)
 
     for i in range(len(ekDirs)):
@@ -83,5 +83,5 @@ else:
         os.chdir('..')
 
 plt.tight_layout()
-#plt.show()
-plt.savefig('radExtent_example_'+chiStr+'.pdf',bbox_inches='tight')
+plt.show()
+#plt.savefig('radExtent_example_'+chiStr+'.pdf',bbox_inches='tight')

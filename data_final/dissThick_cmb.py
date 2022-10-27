@@ -7,6 +7,24 @@ import matplotlib.cm as cm
 from numpy.linalg import norm
 import os
 
+plotStyle = 'dark'
+
+if plotStyle == 'dark':
+    plt.style.use("dark_background")
+    plt.rcParams.update({
+        "axes.facecolor"   : "#1b1b1b",
+        "figure.facecolor" : "#1b1b1b",
+        "figure.edgecolor" : "#1b1b1b",
+        "savefig.facecolor": "#1b1b1b",
+        "savefig.edgecolor": "#1b1b1b"})
+    spanCol = 'gray'
+    schemCol = '#03fcb1'
+    lineCol = 'w'
+else:
+    spanCol = 'gray'
+    schemCol = '#03fcb1'
+    lineCol = 'k'
+
 tksz = 40
 axfontsize=50
 lgfontsize=30
@@ -69,7 +87,7 @@ def getBlayerThicknessSlope(r, D):
 
     return x - r.min()
 
-def plotSchematic(r,D,bound='icb'):
+def plotSchematic(r,D,bound='cmb'):
 
     D /= D.max()
 
@@ -84,28 +102,28 @@ def plotSchematic(r,D,bound='icb'):
 
     p1 = np.polyfit(r[mask], D[mask], 1)
 
-    plt.plot(r, np.polyval(p1, r), color='k', lw=1.5, ls=':')
+    plt.plot(r, np.polyval(p1, r), color=lineCol, lw=1.5, ls=':')
 
     mask = (rFit > rBl + 0.4*d)
 
     p2 = np.polyfit(r[mask], D[mask], 1)
 
-    plt.plot(r, np.polyval(p2, r), color='k', lw=1.5, ls=':')
+    plt.plot(r, np.polyval(p2, r), color=lineCol, lw=1.5, ls=':')
 
     x, y = getLineIntersect(p1[0], p2[0], p1[1], p2[1])
 
-    plt.plot(x, y, 'kX')
+    plt.plot(x, y, 'X',color=lineCol)
 
-    if bound == 'icb':
-        plt.axvspan(r.min(), x, alpha=0.3, color='gray')
-    elif bound == 'cmb':
-        plt.axvspan(r.max(), r.min()+x, alpha=0.3, color='gray')
+    # if bound == 'icb':
+    plt.axvspan(r.min(), x, alpha=0.3, color=spanCol)
+    # elif bound == 'cmb':
+        # plt.axvspan(r.max(), r.min()+x, alpha=0.3, color=spanCol)
     plt.ylim(-0.1, 1)
     plt.tick_params(labelsize=tksz)
     plt.xlabel(r'$r_o - r$', fontsize=axfontsize)
     plt.ylabel(r'$\mathcal{D}_{\nu}(r)/\mathcal{D}_{\nu}(r_o)$', fontsize=axfontsize)
     plt.tight_layout()
-    # plt.savefig('../../../paper/twoSlopeSchematic.pdf',dpi=300)
+    plt.savefig('../../twoSlopeSchematic_'+ bound + plotStyle +'.pdf',dpi=300)
     # plt.close()
 
 ekDirs = ['Ek1e-3', 'Ek1e-4', 'Ek1e-5',  'Ek1e-6', 'Ek1e-7']
@@ -159,7 +177,7 @@ set_ax_params_nogrid(ax)
 ax.legend(fontsize=lgfontsize, frameon=False, bbox_to_anchor=(1.01, 1.01), title=r'$E$', title_fontsize=lgfontsize)
 
 plt.tight_layout()
-#plt.savefig('../paper/blthick_cmb.pdf')
+plt.savefig('blthick_cmb_' + plotStyle + '.pdf')
 
 fig, ax = plt.subplots(figsize=figsize)
 
@@ -172,7 +190,7 @@ print("Scaling: a ek**b , a=%f, b=%f, std_dev=%f"  %(ekCoeff.mean(), ekExp.mean(
 
 ax.plot(chi, ekCoeff, '-o', label=r'$a$',color='#ff7f0e')
 ax.plot(chi, ekExp, '-o', label=r'$b$',color='#1f77b4')
-ax.axhline(y=0.5,lw=2,ls='--',color='k',zorder=-9,label='Ekman layer')
+ax.axhline(y=0.5,lw=2,ls='--',color=lineCol,zorder=-9,label='Ekman layer')
 
 set_ax_params_nogrid(ax)
 ax.set_ylabel('Coefficients', fontsize=axfontsize)
@@ -180,6 +198,6 @@ ax.legend(fontsize=lgfontsize, frameon=False)
 ax.set_yticks(np.arange(0, 3.2, 0.5))
 
 plt.tight_layout()
-plt.show()
+# plt.show()
 
-# plt.savefig('blthick_cmbCoeff.pdf',dpi=300)
+plt.savefig('blthick_cmbCoeff_' + plotStyle +  '.pdf',dpi=300)
