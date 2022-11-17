@@ -24,7 +24,7 @@ def get_airy_sol(s,chi,E):
 
     return vs
 
-mode = 'dark'
+mode = 'light'
 
 if mode == 'dark':
     plt.style.use("dark_background")
@@ -93,5 +93,5 @@ ax.legend(shadow=False,fontsize=1.5*lgfontsize,framealpha=0,
 
 plt.tight_layout()
 plt.subplots_adjust(right=0.972)
-# plt.show()
-plt.savefig('dormySol_comp_'+chiStr+'.pdf',bbox_inches='tight')
+plt.show()
+#plt.savefig('dormySol_comp_'+chiStr+'.pdf',bbox_inches='tight')

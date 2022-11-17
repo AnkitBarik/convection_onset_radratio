@@ -7,7 +7,8 @@ import matplotlib.cm as cm
 from numpy.linalg import norm
 import os
 
-plotStyle = 'dark'
+plotStyle = 'light'
+comp = 'full' # Can be full dissipation or toroidal ('tor')
 
 if plotStyle == 'dark':
     plt.style.use("dark_background")
@@ -54,6 +55,8 @@ def getBlayerThicknessD(r, dat):
         refVec = A
     elif idxMax == len(dat)-1:
         refVec = B
+    else:
+        refVec = A
 
     for i in range(idx, nr):
         P = np.array([r[i], dat[i]])
@@ -96,7 +99,7 @@ def getBlayerThicknessSlope(r,D,tolL=0.4,tolR=0.4,minD=False):
 
     return x - r.min()
 
-def plotSchematic(r,D,bound='icb'):
+def plotSchematic(r,D):
 
     D /= D.max()
 
@@ -122,21 +125,18 @@ def plotSchematic(r,D,bound='icb'):
     x, y = getLineIntersect(p1[0], p2[0], p1[1], p2[1])
 
     plt.plot(x, y, 'X',color=lineCol)
-
-    # if bound == 'icb':
     plt.axvspan(r.min(), x, alpha=0.3, color='gray')
-    # elif bound == 'cmb':
-        # plt.axvspan(r.max(), r.min()+x, alpha=0.3, color='gray')
+
     plt.ylim(-0.1, 1)
     plt.tick_params(labelsize=tksz)
     plt.xlabel(r'$r - r_i$', fontsize=axfontsize)
     plt.ylabel(r'$\mathcal{D}_{\nu}(r)/\mathcal{D}_{\nu}(r_i)$', fontsize=axfontsize)
     plt.tight_layout()
-    plt.savefig('../../twoSlopeSchematic_'+ bound + plotStyle +'.pdf',dpi=300)
+    plt.savefig('../../twoSlopeSchematic_icb' + plotStyle +'.pdf',dpi=300)
     # plt.close()
 
 ekDirs = ['Ek1e-3', 'Ek1e-4', 'Ek1e-5',  'Ek1e-6', 'Ek1e-7']
-ek = [1e-3, 1e-4, 1e-5, 1e-6, 1e-7]
+ek = [1e-3,1e-4,1e-5,1e-6,1e-7]
 chi = np.arange(0.05, 0.98, 0.03)
 
 colors = cm.plasma_r(np.linspace(0.2, 0.8, 5))
@@ -153,7 +153,12 @@ for i in range(len(ekDirs)):
         print(chiDirs[j])
         dat = np.loadtxt('dissipation_profile.dat')
         r = dat[:, 0]
-        Dnu = dat[:, 1]/dat[-1, 1]
+
+        if comp == 'full':
+            Dnu = dat[:, -1]/dat[-1, -1]
+        elif comp == 'tor':
+            Dnu = dat[:, 2]/dat[-1, 2]
+
         d = (r - r[-1])/(ek[i])**(1./3.)
         mask = d <= 5
         # nr = len(r)
@@ -161,8 +166,11 @@ for i in range(len(ekDirs)):
         DFit = Dnu[mask]
 
         if ekDirs[i] == 'Ek1e-6' and chiDirs[j] == '0.50':
-            plotSchematic(rFit, DFit, bound='icb')
+            plotSchematic(rFit, DFit)
+
         if ek[i] == 1e-3 and chi[j] > 0.83:
+            minD = True
+        elif comp == 'tor' and ek[i] == 1e-3 and chi[j] < 0.2:
             minD = True
         else:
             minD = False
@@ -228,6 +236,6 @@ ax.set_yticks(np.arange(0, 3.2, 0.5))
 ax.set_ylim(0, 2)
 
 plt.tight_layout()
-# plt.show()
+#plt.show()
 
 plt.savefig('blthick_icbCoeff_' + plotStyle + '.pdf',dpi=300)

@@ -7,7 +7,9 @@ import matplotlib.cm as cm
 from numpy.linalg import norm
 import os
 
-plotStyle = 'dark'
+plotStyle = 'light'
+comp = 'full' # Can be full dissipation or toroidal ('tor')
+
 
 if plotStyle == 'dark':
     plt.style.use("dark_background")
@@ -53,6 +55,8 @@ def getBlayerThicknessD(r, dat):
         refVec = A
     elif idxMax == len(dat)-1:
         refVec = B
+    else:
+        refVec = A
 
     for i in range(idx, nr):
         P = np.array([r[i], dat[i]])
@@ -87,7 +91,7 @@ def getBlayerThicknessSlope(r, D):
 
     return x - r.min()
 
-def plotSchematic(r,D,bound='cmb'):
+def plotSchematic(r,D):
 
     D /= D.max()
 
@@ -114,16 +118,14 @@ def plotSchematic(r,D,bound='cmb'):
 
     plt.plot(x, y, 'X',color=lineCol)
 
-    # if bound == 'icb':
     plt.axvspan(r.min(), x, alpha=0.3, color=spanCol)
-    # elif bound == 'cmb':
-        # plt.axvspan(r.max(), r.min()+x, alpha=0.3, color=spanCol)
+
     plt.ylim(-0.1, 1)
     plt.tick_params(labelsize=tksz)
     plt.xlabel(r'$r_o - r$', fontsize=axfontsize)
     plt.ylabel(r'$\mathcal{D}_{\nu}(r)/\mathcal{D}_{\nu}(r_o)$', fontsize=axfontsize)
     plt.tight_layout()
-    plt.savefig('../../twoSlopeSchematic_'+ bound + plotStyle +'.pdf',dpi=300)
+    plt.savefig('../../twoSlopeSchematic_cmb' + plotStyle +'.pdf',dpi=300)
     # plt.close()
 
 ekDirs = ['Ek1e-3', 'Ek1e-4', 'Ek1e-5',  'Ek1e-6', 'Ek1e-7']
@@ -144,14 +146,19 @@ for i in range(len(ekDirs)):
         print(chiDirs[j])
         dat = np.loadtxt('dissipation_profile.dat')
         r = dat[:, 0]
-        Dnu = dat[:, 1]
+
+        if comp == 'full':
+            Dnu = dat[:, -1]/dat[0, -1]
+        elif comp == 'tor':
+            Dnu = dat[:, 2]/dat[0, 2]
+
         d = (r[0] - r)/np.sqrt(ek[i])
         mask = d <= 20
         rFit = r[0] - r[mask]
         DFit = Dnu[mask]
-        delta_cmb[i, j] = getBlayerThicknessSlope(rFit, DFit)
         if ekDirs[i] == 'Ek1e-6' and chiDirs[j] == '0.50':
             plotSchematic(rFit, DFit)
+        delta_cmb[i, j] = getBlayerThicknessSlope(rFit, DFit)
         print(os.getcwd())
         os.chdir('..')
 
@@ -198,6 +205,6 @@ ax.legend(fontsize=lgfontsize, frameon=False)
 ax.set_yticks(np.arange(0, 3.2, 0.5))
 
 plt.tight_layout()
-# plt.show()
+#plt.show()
 
 plt.savefig('blthick_cmbCoeff_' + plotStyle +  '.pdf',dpi=300)

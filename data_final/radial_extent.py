@@ -19,13 +19,11 @@ ek = [1e-4, 1e-5, 1e-6, 1e-7]
 chi = np.arange(0.05, 0.98, 0.03)
 colors = cm.plasma_r(np.linspace(0.2, 0.8, 5)[1:])
 
-idx0_5 = np.argmin(np.abs(chi-0.5))
-
 if schematic:
 
     fig, ax = plt.subplots(1, 1, figsize=figsize)
 
-    chi1 = 0.35
+    chi1 = 0.92
     chiStr = "{:.2f}".format(chi1)
 
     for i in range(len(ekDirs)):
@@ -83,5 +81,5 @@ else:
         os.chdir('..')
 
 plt.tight_layout()
-plt.show()
-#plt.savefig('radExtent_example_'+chiStr+'.pdf',bbox_inches='tight')
+# plt.show()
+plt.savefig('radExtent_example_'+chiStr+'.pdf',bbox_inches='tight')
