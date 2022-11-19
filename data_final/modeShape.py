@@ -63,7 +63,7 @@ def set_ax_params_nogrid(ax):
 
 ekDirs = ['Ek1e-4', 'Ek1e-5',  'Ek1e-6', 'Ek1e-7']
 ek = [1e-4, 1e-5, 1e-6, 1e-7]
-#ekDirs = ['Ek1e-4']
+#ekDirs = ['Ek1e-6']
 #ek = [1e-4]
 chi = np.arange(0.05, 0.98, 0.03)
 

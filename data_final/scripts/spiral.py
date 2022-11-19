@@ -27,11 +27,19 @@ ur_norm = np.zeros_like(ur)
 for i in range(len(r)):
     ur_norm[i,:] = ur[i,:]/(np.abs(ur[i,:]).max())
 
-phi = M.phi[:M.nphi]
-phase = np.zeros(ur_norm.shape[0])
+if M.m > 1:
+    ur_norm_full = np.zeros([len(r), M.nphi*3 + 1])
+    ur_norm_full[:,:-1] = np.tile(ur_norm,3)
+    ur_norm_full[:,-1] = ur_norm[:,0]
+else:
+    ur_norm_full = ur_norm
+
+
+phi = M.phi[:M.nphi*3+1]
+phase = np.zeros(ur_norm_full.shape[0])
 
 for i in range(len(r)):
-    corr = np.correlate(ur_norm[i,:],ur_norm[0,:],'same')
+    corr = np.correlate(ur_norm_full[i,:],ur_norm_full[0,:],'same')
     phase[i] = phi[np.argmax(corr)]
 
 # Get rid of inner boundary
@@ -42,14 +50,20 @@ dPhi = np.diff(phase)
 idx = np.argmax(np.abs(dPhi))
 
 if np.abs(dPhi[idx]) > np.pi/M.m:
-    if dPhi[idx] < 0:
-        phi[idx+1:] += np.abs(dPhi[idx])
-    else:
-        phi[:idx] -= np.abs(dPhi[idx])
+    phase[idx+1:] -= dPhi[idx]
+
+dPhi = np.diff(phase)
+idx = np.argmax(np.abs(dPhi))
+
+if np.abs(dPhi[idx]) > np.pi/M.m:
+    phase[idx+1:] -= dPhi[idx]
+
 
 x = r*np.cos(phase)
 y = r*np.sin(phase)
 
 X = np.vstack([r,phase,x,y])
-
 np.savetxt('modeShape.dat',X.transpose())
+#eqContour(r,phi,ur_norm_full[:-1,:].T,levels=30,cmap='seismic')
+#plt.plot(x,y,'k-o')
+#plt.show()
