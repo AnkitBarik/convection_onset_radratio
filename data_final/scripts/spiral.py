@@ -27,25 +27,25 @@ ur_norm = np.zeros_like(ur)
 for i in range(len(r)):
     ur_norm[i,:] = ur[i,:]/(np.abs(ur[i,:]).max())
 
-ur_norm_full = np.zeros([len(r),M.nphi*M.m + 1])
-ur_norm_full[:,:-1] = np.tile(ur_norm,M.m)
-ur_norm_full[:,-1] = ur_norm[:,0]
-
-phase = np.zeros(ur_norm_full.shape[0])
+phi = M.phi[:M.nphi]
+phase = np.zeros(ur_norm.shape[0])
 
 for i in range(len(r)):
-    corr = np.correlate(ur_norm_full[i,:],ur_norm_full[0,:],'same')
-    phase[i] = M.phi[np.argmax(corr)]
+    corr = np.correlate(ur_norm[i,:],ur_norm[0,:],'same')
+    phase[i] = phi[np.argmax(corr)]
 
 # Get rid of inner boundary
 r = r[:-1]
 phase = phase[:-1]
 
-dPhi = np.abs(np.diff(phase))
-idx = np.argmax(dPhi)
+dPhi = np.diff(phase)
+idx = np.argmax(np.abs(dPhi))
 
-if dPhi[idx] > np.pi/M.m:
-    phase[:idx+1] += 2*np.pi/M.m
+if np.abs(dPhi[idx]) > np.pi/M.m:
+    if dPhi[idx] < 0:
+        phi[idx+1:] += np.abs(dPhi[idx])
+    else:
+        phi[:idx] -= np.abs(dPhi[idx])
 
 x = r*np.cos(phase)
 y = r*np.sin(phase)
