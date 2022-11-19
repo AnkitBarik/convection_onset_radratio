@@ -36,20 +36,17 @@ figsizeE = (16, 9)
 major_ticks = np.arange(0., 1.1, 0.2)
 minor_ticks = np.arange(0.05, 0.96, 0.03)
 
-def get_spirality(x,y):
-
-    r = np.sqrt(x**2 + y**2)
-    phi = np.arctan2(y,x)
+def get_spirality(r,phi):
 
     delta_r = r.max() - r.min()
     delta_phi = phi.max() - phi.min()
 
-    b_sp = np.nanmean(np.abs(delta_phi)/np.abs(delta_r))
+    b_sp = np.abs(delta_phi)/np.abs(delta_r)
 
-    # dy = np.gradient(y,x)
-    # ddy = np.gradient(dy,x)
+    #dy = np.gradient(y,x)
+    #ddy = np.gradient(dy,x)
 
-    # curvature =  np.abs(ddy)/( (1 + dy**2)**(3./2.) )
+    #curvature =  np.abs(ddy)/( (1 + dy**2)**(3./2.) )
 
     return b_sp
 
@@ -64,11 +61,11 @@ def set_ax_params_nogrid(ax):
     ax.xaxis.set_ticks_position('bottom')
     ax.yaxis.set_ticks_position('left')
 
-ekDirs = ['Ek1e-3', 'Ek1e-4', 'Ek1e-5',  'Ek1e-6', 'Ek1e-7']
-ek = [1e-3, 1e-4, 1e-5, 1e-6, 1e-7]
+ekDirs = ['Ek1e-4', 'Ek1e-5',  'Ek1e-6', 'Ek1e-7']
+ek = [1e-4, 1e-5, 1e-6, 1e-7]
 chi = np.arange(0.05, 0.98, 0.03)
 
-colors = cm.plasma_r(np.linspace(0.2, 0.8, 5))
+colors = cm.plasma_r(np.linspace(0.2, 0.8, 5))[1:]
 fig, ax = plt.subplots(figsize=(14, 9))
 
 b_sp = np.zeros_like(chi)
@@ -79,11 +76,11 @@ for i in range(len(ekDirs)):
     for j in range(len(chiDirs)):
         os.chdir(chiDirs[j])
         dat = np.loadtxt('modeShape.dat')
+        
+        r = dat[:,0]
+        phi = dat[:,1]
 
-        x = dat[:,0]/(1-chi[j])
-        y = dat[:,1]/(1-chi[j])
-
-        b_sp[j] = get_spirality(x,y)
+        b_sp[j] = get_spirality(r,phi)
 
         if b_sp[j] <= 1e-4: # Some modes are pretty straight lines, so one gets near zero values
             b_sp[j] = np.nan
@@ -91,7 +88,7 @@ for i in range(len(ekDirs)):
         print(os.getcwd())
         os.chdir('..')
 
-    ax.semilogy(chi, b_sp/, 'o', color=colors[i], label=r'$10^{%d}$' %np.log10(ek[i]))
+    ax.semilogy(chi, b_sp, 'o', color=colors[i], label=r'$10^{%d}$' %np.log10(ek[i]))
     os.chdir('..')
 
 

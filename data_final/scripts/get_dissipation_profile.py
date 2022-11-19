@@ -5,20 +5,17 @@ import numpy.polynomial.chebyshev as ch
 from glob import glob
 import os
 
-mdir = glob("Rac_m*")[0] #Replace with data directory
-
-os.chdir(mdir)
-
 pwd = os.getcwd()
 
 sys.path.insert(0, pwd)
+sys.path.insert(0, pwd + '/bin')
 
 import utils as ut
 import parameters as par
 
 
 solnum = 0
-nR = par.N # number of radial points
+nR = par.N + 2# number of radial points
 
 lmax = par.lmax
 m    = par.m
@@ -34,28 +31,17 @@ R1 = ricb
 R2 = rcmb
 
 # xk are the colocation points, from -1 to 1
-i = np.arange(0, nR)
-xk = np.cos( (i+0.5)*np.pi/nR )
-x1 = ( (R2-R1)*xk + (R1+R2) - (ricb+rcmb) )/(rcmb-ricb)
+i = np.arange(0, nR-2)
+xk = np.r_[1, np.cos( (i+0.5)*np.pi/nR), -1]
 # rk are the radial colocation points, from Ra to Rb
-r = 0.5*(rcmb-ricb)*( x1 + 1 ) + ricb
+r = 0.5*(rcmb-ricb)*( xk + 1 ) + ricb
 r2 = r**2
 
 Inv_r = ss.diags(1/r, 0)
 
 
 # matrix with Chebishev polynomials at every x point for all degrees:
-chx = ch.chebvander(x1, par.N-1) # this matrix has nR rows and N-1 cols
-
-
-#u = np.loadtxt('flow.dat')  		# flow data
-#KP = u[:,0] 					# Poloidal kinetic energy
-#KT = u[:,1] 					# Toroidal kinetic energy
-#K  = KP + KT
-
-w = np.loadtxt('eigenvalues.dat')
-if len(w.shape)==1:
-	w = w.reshape((-1, len(w)))
+chx = ch.chebvander(xk, par.N-1) # this matrix has nR rows and N-1 cols
 
 
 reu = np.loadtxt('real_flow.field', usecols=solnum)
@@ -169,11 +155,11 @@ for k, l in enumerate(lut):
 	dint_tor[k,:] = f0*( f1+f2 )
 
 
+dpol = np.real(sum(dint_pol, 0)*par.Ek)
+dtor = np.real(sum(dint_tor, 0)*par.Ek)
 dint = np.real(sum(dint_pol+dint_tor, 0)*par.Ek)
 
 
-var = np.vstack([r, dint])
-
-os.chdir('..')
+var = np.vstack([r, dpol, dtor, dint])
 
 np.savetxt('dissipation_profile.dat', var.transpose())

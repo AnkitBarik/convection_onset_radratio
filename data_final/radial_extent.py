@@ -34,7 +34,7 @@ if schematic:
         KE = dat[:, 1]
         ri = chi1/(1-chi1)
         label = r'$10^{%d}$' %(np.log10(ek[i]))
-        idx = np.argmin(np.abs(s-ri))
+        #idx = np.argmin(np.abs(s-ri))
         ax.plot((s-ri)/ek[i]**(2./9.), KE/KE.max(), color=colors[i], label=label)
         ax.set_xlim(0, 15)
         print(s[np.argmax(KE)])
