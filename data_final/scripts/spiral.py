@@ -64,6 +64,3 @@ y = r*np.sin(phase)
 
 X = np.vstack([r,phase,x,y])
 np.savetxt('modeShape.dat',X.transpose())
-#eqContour(r,phi,ur_norm_full[:-1,:].T,levels=30,cmap='seismic')
-#plt.plot(x,y,'k-o')
-#plt.show()
