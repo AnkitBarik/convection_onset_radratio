@@ -63,6 +63,8 @@ def set_ax_params_nogrid(ax):
 
 ekDirs = ['Ek1e-4', 'Ek1e-5',  'Ek1e-6', 'Ek1e-7']
 ek = [1e-4, 1e-5, 1e-6, 1e-7]
+#ekDirs = ['Ek1e-4']
+#ek = [1e-4]
 chi = np.arange(0.05, 0.98, 0.03)
 
 colors = cm.plasma_r(np.linspace(0.2, 0.8, 5))[1:]
@@ -97,5 +99,5 @@ ax.set_ylabel(r'$\frac{\Delta\phi}{\Delta s}$', fontsize=1.2*axfontsize, rotatio
 ax.legend(fontsize=lgfontsize, frameon=False)
 
 plt.tight_layout()
-plt.show()
-# plt.savefig('modeSpiral.pdf',dpi=300)
+#plt.show()
+plt.savefig('modeSpiral.pdf',dpi=300)
