@@ -1,4 +1,5 @@
 # Data and scripts for article <br/> "Onset of convection in rotating spherical shells: variations with radius ratio"
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![DOI](https://zenodo.org/badge/534400607.svg)](https://zenodo.org/badge/latestdoi/534400607) 
 
 The data contains five folders for each Ekman number and within each there are 31 folders for each radius ratio
 explored. Inside each of these subfolders there are in general four files. The first column of each file is radius.
